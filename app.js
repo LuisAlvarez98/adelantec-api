@@ -1,4 +1,4 @@
-require("dotenv").config();
+const dotenv = require("dotenv");
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("./middleware/cors");
@@ -10,9 +10,22 @@ const PORT = process.env.PORT || 8080;
 /** Setup app */
 const app = express();
 
-mongoose.connect("mongodb://localhost:27017/rcid", {
-  useNewUrlParser: "true",
-});
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({ path: ".env" });
+}
+/** Setup Mongoose */
+const db = process.env.DATABASE.replace(
+  "<password>",
+  process.env.DATABASE_PASSWORD
+);
+console.log(db);
+mongoose
+  .connect(db, {
+    useNewUrlParser: true,
+  })
+  .then((connection) => {
+    console.log("DB connection sucessful!");
+  });
 
 /** Setup global middlewares */
 app.use(cors);
